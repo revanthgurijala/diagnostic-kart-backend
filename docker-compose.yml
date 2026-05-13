@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=diagnostic_db
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=2112
+    ports:
+      - "5433:5432"

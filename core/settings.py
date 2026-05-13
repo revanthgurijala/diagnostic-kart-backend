@@ -78,8 +78,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'diagnostic_db',
+        'USER': 'admin',
+        'PASSWORD': '2112',
+        'HOST': '127.0.0.1',
+        'PORT': '5433',
     }
 }
 
@@ -120,4 +124,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-CORS_ALLOW_ALL_ORIGINS = True # We will make this more strict during deployment
+CORS_ALLOW_ALL_ORIGINS = True  # We will make this more strict during deployment
+
+import os
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
