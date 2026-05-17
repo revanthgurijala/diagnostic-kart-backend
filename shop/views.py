@@ -1,5 +1,6 @@
 import json
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .models import DiagnosticProfile, MedicalTest, TestParameter
 from .serializers import DiagnosticProfileSerializer, MedicalTestSerializer, TestParameterSerializer
 
@@ -7,6 +8,7 @@ from .serializers import DiagnosticProfileSerializer, MedicalTestSerializer, Tes
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = DiagnosticProfile.objects.all()
     serializer_class = DiagnosticProfileSerializer
 
@@ -31,27 +33,26 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
 
 class MedicalTestViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = MedicalTest.objects.all()
     serializer_class = MedicalTestSerializer
 
-    # Intercept creation to save the nested parameters
     def perform_create(self, serializer):
         test = serializer.save()
         self._save_parameters(test)
+        self._save_profiles(test)
 
-    # Intercept update to overwrite the nested parameters
     def perform_update(self, serializer):
         test = serializer.save()
-        test.parameters.all().delete()  # Wipe old parameters
-        self._save_parameters(test)    # Save new parameters
+        test.parameters.all().delete()
+        self._save_parameters(test)
+        self._save_profiles(test)
 
-    # The unpacking logic
     def _save_parameters(self, test):
         parameters_json = self.request.data.get('parameters_json')
         if parameters_json:
             params = json.loads(parameters_json)
             for p in params:
-                # We only create it if they actually typed a name
                 if p.get('name'):
                     TestParameter.objects.create(
                         medical_test=test,
@@ -60,7 +61,15 @@ class MedicalTestViewSet(viewsets.ModelViewSet):
                         purpose=p.get('purpose', '')
                     )
 
+    def _save_profiles(self, test):
+        profiles_json = self.request.data.get('profiles_json')
+        if profiles_json is not None:
+            profile_ids = json.loads(profiles_json)
+            # This safely links the test to the chosen profiles
+            test.profiles.set(profile_ids)
+
 
 class TestParameterViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticatedOrReadOnly]
     queryset = TestParameter.objects.all()
     serializer_class = TestParameterSerializer

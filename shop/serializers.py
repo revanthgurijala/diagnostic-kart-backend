@@ -9,8 +9,8 @@ class TestParameterSerializer(serializers.ModelSerializer):
 
 
 class MedicalTestSerializer(serializers.ModelSerializer):
-    # Pull in the nested parameters
     parameters = TestParameterSerializer(many=True, read_only=True)
+    profiles = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = MedicalTest
