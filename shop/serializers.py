@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import MedicalTest, DiagnosticProfile, TestParameter
+from .models import MedicalTest, DiagnosticProfile, TestParameter, Booking
 
 
 class TestParameterSerializer(serializers.ModelSerializer):
@@ -22,4 +22,12 @@ class DiagnosticProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DiagnosticProfile
+        fields = '__all__'
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    test_name = serializers.ReadOnlyField(source='test.name')
+
+    class Meta:
+        model = Booking
         fields = '__all__'

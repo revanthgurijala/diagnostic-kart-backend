@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,6 +43,15 @@ INSTALLED_APPS = [
     'corsheaders',
     'shop',
 ]
+
+# Tell Django REST Framework to actively look for and validate Tokens
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        # Keeps the default web admin working
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -127,7 +137,15 @@ STATIC_URL = 'static/'
 
 CORS_ALLOW_ALL_ORIGINS = True  # We will make this more strict during deployment
 
-import os
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+RAZORPAY_KEY_ID = 'rzp_test_SrVzYH2d8eNRMO'
+RAZORPAY_KEY_SECRET = 'T8joN22b1H7DuDBMjz2X32wD'
+
+
+# During development, this prints emails to the console instead of actually sending them.
+# For production, you will change this to 'smtp.EmailBackend' and add your Gmail credentials.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@diagnostickart.com'
